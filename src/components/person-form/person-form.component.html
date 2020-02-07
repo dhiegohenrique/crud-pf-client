@@ -1,0 +1,40 @@
+<section class="person-form">
+  <v-form>
+    <v-row class="fill-height ma-0" align="center" justify="space-between" no-gutters>
+      <v-col cols="6">
+        <v-text-field v-model="person.name" label="Nome" :error-messages="getNameErrors()" maxlength="100"
+          :disabled="isReadOnly" />
+      </v-col>
+      <v-col cols="6">
+        <v-text-field v-model="person.cpf" label="CPF" v-mask="'###.###.###-##'" :error-messages="getCpfErrors()"
+          @input="$v.person.cpf.$touch()" @blur="validateLength($event, 14)" :disabled="isReadOnly" />
+      </v-col>
+    </v-row>
+    <v-row no-gutters>
+      <v-col cols="6">
+        <v-text-field v-model="person.email" label="E-mail" :error-messages="getEmailErrors()" maxlength="100"
+          :disabled="isReadOnly" />
+      </v-col>
+      <v-col cols="6">
+        <v-text-field v-model="person.birthDate" label="Data de nascimento" v-mask="'##/##/####'"
+          :error-messages="getBirthDateErrors()" @input="$v.person.birthDate.$touch()"
+          @blur="validateLength($event, 10)" :disabled="isReadOnly" />
+      </v-col>
+    </v-row>
+  </v-form>
+
+  <v-row class="bottom-bar">
+    <v-col cols="6" class="text-right">
+      <v-btn color="primary" @click="add" id="add">
+        <v-icon>save</v-icon>
+        Salvar
+      </v-btn>
+    </v-col>
+    <v-col cols="6" class="text-left">
+      <v-btn color="error" @click="clear" id="clear">
+        <v-icon>clear</v-icon>
+        Limpar
+      </v-btn>
+    </v-col>
+  </v-row>
+</section>
