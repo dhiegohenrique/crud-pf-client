@@ -1,0 +1,9 @@
+/build/
+/config/
+/dist/
+/*.js
+/test/unit/coverage/
+*.spec.js
+/test/e2e/
+*.umd.min.js
+scripts/google-analytics.js
