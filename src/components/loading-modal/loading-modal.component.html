@@ -1,0 +1,16 @@
+<section v-show="showLoading">
+  <v-dialog v-model="showLoading" persistent max-width="290" content-class="loading-content" id="loading-modal">
+    <div class="container-external">
+      <v-card>
+        <v-card-text>
+          <v-progress-circular indeterminate :size="50" :width="7" color="primary" />
+          <v-row no-gutters>
+            <v-col>
+              Aguarde...
+            </v-col>
+          </v-row>
+        </v-card-text>
+      </v-card>
+    </div>
+  </v-dialog>
+</section>
