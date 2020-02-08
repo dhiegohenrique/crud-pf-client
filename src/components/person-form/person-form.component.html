@@ -55,7 +55,7 @@
             </v-row>
           </v-expansion-panel-header>
           <v-expansion-panel-content eager>
-            <address-form :ref="'address-form-'+index" @address="address" />
+            <address-form :ref="'address-form-'+index" :address="address" />
           </v-expansion-panel-content>
         </v-expansion-panel>
       </v-expansion-panels>
@@ -69,9 +69,38 @@
     </v-tab-item>
 
     <v-tab-item key="tab-contact" value="contact">
-      <div style="background: red; height: 200px; width: 100%;">
+      <v-expansion-panels multiple v-model="invalidContact">
+        <v-expansion-panel v-for="(contact, index) in person.contact" :key="index">
+          <v-expansion-panel-header>
+            <v-row class="fill-height ma-0" align="center" justify="space-between" no-gutters>
+              <v-col>
+                Contato {{index + 1}}
+              </v-col>
+              <v-col class="text-right">
+                <v-tooltip bottom>
+                <!-- <v-tooltip bottom v-if="person.contact.length > 1"> -->
+                  <template v-slot:activator="{ on }">
+                    <v-btn fab color="error" v-on="on" x-small @click="removeContact($event, index)">
+                      <v-icon>remove</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Excluir</span>
+                </v-tooltip>
+              </v-col>
+            </v-row>
+          </v-expansion-panel-header>
+          <v-expansion-panel-content eager>
+            <contact :ref="'contact-'+index" :contact="contact" />
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
 
-      </div>
+      <v-row class="fill-height ma-0 bottom-bar" align="center" justify="end">
+        <v-btn color="primary" depressed @click="newContact">
+          Novo
+          <v-icon>add</v-icon>
+        </v-btn>
+      </v-row>
     </v-tab-item>
   </v-tabs>
 

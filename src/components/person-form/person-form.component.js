@@ -3,9 +3,8 @@ import { mask } from 'vue-the-mask'
 import { required, email, minLength } from 'vuelidate/lib/validators'
 import cpfGenerator from '@fnando/cpf/dist/node'
 import AddressForm from '@/components/address-form/index'
+import Contact from '@/components/contact/index'
 import moment from 'moment-timezone'
-moment.tz.setDefault('America/Sao_Paulo')
-moment.locale('pt-BR')
 
 export default {
   name: 'person-form',
@@ -14,7 +13,8 @@ export default {
     mask
   },
   components: {
-    AddressForm
+    AddressForm,
+    Contact
   },
   props: {
     person: {
@@ -30,12 +30,15 @@ export default {
               street: '',
               cep: '',
               neighborhood: '',
-              birthDate: '',
               city: '',
               uf: ''
             }
           ],
-          contact: []
+          contact: [
+            {
+              cellphone: ''
+            }
+          ]
         }
       }
     },
@@ -157,7 +160,7 @@ export default {
           if (validate) {
             isValidAddress.push(validate())
           }
-        } else if (component.$options._componentTag.includes('contact-form')) {
+        } else if (component.$options._componentTag.includes('contact')) {
           const validate = component.validate
           if (validate) {
             isValidContact.push(validate())
@@ -202,7 +205,7 @@ export default {
 
       Object.keys(this.$refs).forEach((ref) => {
         const component = this.$refs[ref][0]
-        const tags = ['address-form', 'contact-form']
+        const tags = ['address-form', 'contact']
         if (tags.includes(component.$options._componentTag)) {
           const clear = component.clear
           if (clear) {
@@ -222,13 +225,21 @@ export default {
         street: '',
         cep: '',
         neighborhood: '',
-        birthDate: '',
         city: '',
         uf: ''
       })
     },
+    newContact () {
+      this.person.contact.push({
+        cellphone: ''
+      })
+    },
     removeAddress ($event, index) {
       this.person.address.splice(index, 1)
+      $event.stopPropagation()
+    },
+    removeContact ($event, index) {
+      this.person.contact.splice(index, 1)
       $event.stopPropagation()
     }
   }
