@@ -1,19 +1,31 @@
-import moment from 'moment-timezone'
-moment.locale('pt-BR')
+import BaseMixin from './base.mixin'
 
 const mixin = {
+  mixins: [
+    BaseMixin
+  ],
+  data () {
+    return {
+      urlPerson: '/person'
+    }
+  },
   methods: {
-    getFormattedDateHour (date) {
-      return moment(date).format('dddd, DD/MM/YYYY HH:mm:ss').toLowerCase()
+    insert (person) {
+      return this.requestPost(this.urlPerson, person)
     },
-    getFormattedHour (date) {
-      return moment.unix(date).tz('America/Sao_Paulo').format('HH:mm')
+    update (person) {
+      return this.requestPut(this.urlPerson, person)
     },
-    getFormattedDay (date) {
-      return moment(date).format('dddd, DD/MM/YYYY').toLowerCase()
+    delete (_id) {
+      return this.requestDelete(`${this.urlPerson}/${_id}`)
     },
-    getFormattedDate (date) {
-      return moment(date).format('DD/MM/YYYY')
+    get (_id) {
+      let url = this.urlPerson
+      if (_id) {
+        url += `/${_id}`
+      }
+
+      return this.requestGet(url)
     }
   }
 }

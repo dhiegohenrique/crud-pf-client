@@ -16,7 +16,7 @@ const mixin = {
     requestPut (url, data) {
       return this.baseService.put(url, data)
     },
-    delete (url) {
+    requestDelete (url) {
       return this.baseService.delete(url)
     }
   }
