@@ -77,8 +77,7 @@
                 Contato {{index + 1}}
               </v-col>
               <v-col class="text-right">
-                <v-tooltip bottom>
-                <!-- <v-tooltip bottom v-if="person.contact.length > 1"> -->
+                <v-tooltip bottom v-if="person.contact.length > 1">
                   <template v-slot:activator="{ on }">
                     <v-btn fab color="error" v-on="on" x-small @click="removeContact($event, index)">
                       <v-icon>remove</v-icon>

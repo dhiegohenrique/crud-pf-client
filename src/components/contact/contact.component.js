@@ -46,10 +46,11 @@ export default {
       cellphone: {
         required,
         valid: function (value) {
-          if (!(value.length === 10 || value.length === 11)) {
-            return false
+          if (value.length < 13) {
+            return true
           }
 
+          value = value.replace(/\D/g, '')
           const splitNumbers = value.split('')
           const number = splitNumbers[0]
           const sameNumber = splitNumbers.every((currentNumber) => {
@@ -90,7 +91,7 @@ export default {
       this.$v.$reset()
     },
     validateLength (event) {
-      if (event.target.value.length < 10) {
+      if (event.target.value.length < 13) {
         event.target.value = ''
         event.target.dispatchEvent(new Event('input'))
       }
