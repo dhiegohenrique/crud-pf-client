@@ -5,10 +5,14 @@ import cpfGenerator from '@fnando/cpf/dist/node'
 import AddressForm from '@/components/address-form/index'
 import Contact from '@/components/contact/index'
 import moment from 'moment-timezone'
+import personMixin from '@/shared/mixins/person.mixin'
 
 export default {
   name: 'person-form',
-  mixins: [validationMixin],
+  mixins: [
+    validationMixin,
+    personMixin
+  ],
   directives: {
     mask
   },
@@ -147,7 +151,7 @@ export default {
 
       return errors
     },
-    add () {
+    async add () {
       this.$v.$touch()
       const isValid = !this.$v.$invalid
       const isValidAddress = []
@@ -168,15 +172,26 @@ export default {
         }
       })
 
-      this.invalidAddress = this.getInvalidIndex(isValidAddress, 'address-expansion-')
-      this.invalidContact = this.getInvalidIndex(isValidContact, 'contact-expansion-')
+      this.invalidAddress = this.getInvalidIndex(isValidAddress)
+      this.invalidContact = this.getInvalidIndex(isValidContact)
 
       if (!isValid || this.invalidAddress.length || this.invalidContact.length) {
         return
       }
 
-      // eslint-disable-next-line no-console
-      console.log('entrou aqui: ' + JSON.stringify(this.person))
+      const person = this._.cloneDeep(this.person)
+      person.contact = person.contact.map((contact) => {
+        return contact.cellphone
+      })
+
+      try {
+        this.$root.$emit('showLoading')
+        const res = await this.insert(person)
+        this.$root.$emit('showToast', 'Pessoa cadastrada com sucesso.')
+        this.$emit('save', res.data)
+      } finally {
+        this.$root.$emit('hideLoading')
+      }
     },
     getInvalidIndex (array) {
       const invalidIndex = []

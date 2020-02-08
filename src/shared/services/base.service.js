@@ -34,7 +34,7 @@ class BaseService {
   getClient () {
     const client = axios.create({
       baseURL: process.env.VUE_APP_URL_API,
-      timeout: 30000
+      timeout: 60000
     })
 
     client.interceptors.response.use((response) => {

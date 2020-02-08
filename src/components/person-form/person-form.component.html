@@ -24,12 +24,12 @@
   </v-form>
 
   <v-tabs centered color="primary" background-color="#E0E0E0" icons-and-text v-model="activeTab">
-    <v-tab href="#address">
+    <v-tab href="#address" :class="{'tab-error': invalidAddress.length}">
       Endereços
       <v-icon>local_library</v-icon>
     </v-tab>
 
-    <v-tab href="#contact">
+    <v-tab href="#contact" :class="{'tab-error': invalidContact.length}">
       Contatos
       <v-icon>local_phone</v-icon>
     </v-tab>
@@ -68,7 +68,7 @@
       </v-row>
     </v-tab-item>
 
-    <v-tab-item key="tab-contact" value="contact">
+    <v-tab-item key="tab-contact" value="contact" eager>
       <v-expansion-panels multiple v-model="invalidContact">
         <v-expansion-panel v-for="(contact, index) in person.contact" :key="index">
           <v-expansion-panel-header>
