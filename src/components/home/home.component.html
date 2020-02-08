@@ -21,7 +21,7 @@
   </v-row>
 
   <v-data-table :headers="headers" :items="formattedPeople" item-key="_id" show-expand class="elevation-1"
-    :hide-default-footer="true" :no-data-text="notData" :no-results-text="notFound" @item-expanded="itemExpanded" >
+    :hide-default-footer="true" :no-data-text="notData" :no-results-text="notFound" @item-expanded="itemExpanded" :expanded.sync="expanded" >
     <template v-slot:expanded-item="{ headers, item }">
       <td :colspan="headers.length" class="details">
         <person-form v-slot:expanded-item="{ headers }" :person="item.details" v-if="item.details" @save="save" />

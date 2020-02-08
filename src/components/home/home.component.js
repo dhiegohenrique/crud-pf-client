@@ -72,8 +72,7 @@ export default {
         this.people.unshift(person)
       } else {
         this.$set(this.people, index, person)
-        // eslint-disable-next-line no-console
-        console.log('expanded: ' + JSON.stringify(this.expanded))
+        this.expanded.splice(index, 1)
       }
     },
     searchItem () {
