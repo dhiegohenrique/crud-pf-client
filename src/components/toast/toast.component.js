@@ -3,7 +3,7 @@ export default {
   mounted () {
     this.$root.$on('showToast', (message) => {
       this.$toasted.show(message, {
-        icon: 'info',
+        icon: 'success',
         duration: 5000,
         action: {
           icon: 'close',

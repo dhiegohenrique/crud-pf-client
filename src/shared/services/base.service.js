@@ -33,7 +33,7 @@ class BaseService {
 
   getClient () {
     const client = axios.create({
-      baseURL: '',
+      baseURL: process.env.VUE_APP_URL_API,
       timeout: 60000
     })
 
@@ -49,6 +49,18 @@ class BaseService {
 
   get (url) {
     return this.client.get(url)
+  }
+
+  post (url, data) {
+    return this.client.post(url, data)
+  }
+
+  put (url, data) {
+    return this.client.put(url, data)
+  }
+
+  delete (url) {
+    return this.client.delete(url)
   }
 }
 export default () => {

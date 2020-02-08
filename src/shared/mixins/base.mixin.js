@@ -9,6 +9,15 @@ const mixin = {
   methods: {
     requestGet (url) {
       return this.baseService.get(url)
+    },
+    requestPost (url, data) {
+      return this.baseService.post(url, data)
+    },
+    requestPut (url, data) {
+      return this.baseService.put(url, data)
+    },
+    requestDelete (url) {
+      return this.baseService.delete(url)
     }
   }
 }
