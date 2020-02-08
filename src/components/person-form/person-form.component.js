@@ -160,23 +160,7 @@ export default {
     async save () {
       this.$v.$touch()
       const isValid = !this.$v.$invalid
-      const isValidAddress = []
-      const isValidContact = []
-
-      Object.keys(this.$refs).forEach((ref) => {
-        const component = this.$refs[ref][0]
-        if (component.$options._componentTag.includes('address-form')) {
-          const validate = component.validate
-          if (validate) {
-            isValidAddress.push(validate())
-          }
-        } else if (component.$options._componentTag.includes('contact')) {
-          const validate = component.validate
-          if (validate) {
-            isValidContact.push(validate())
-          }
-        }
-      })
+      const { isValidAddress, isValidContact } = await this.validateComponents()
 
       this.invalidAddress = this.getInvalidIndex(isValidAddress)
       this.invalidContact = this.getInvalidIndex(isValidContact)
@@ -193,20 +177,20 @@ export default {
         address.cep = address.cep.replace(/\D/g, '')
         return address
       })
-      person.contact = person.contact.map((contact) => {
-        return contact.cellphone.replace(/\D/g, '')
-      })
       person.birthDate = moment(person.birthDate, 'DD/MM/YYYY')
 
       try {
         this.$root.$emit('showLoading')
         let res
         if (!person._id) {
+          person.contact = person.contact.map((contact) => {
+            return contact.cellphone.replace(/\D/g, '')
+          })
+
           res = await this.insert(person)
           this.$root.$emit('showToast', 'Pessoa cadastrada com sucesso.')
+          this.cancel()
         } else {
-          // eslint-disable-next-line no-console
-          console.log('vai atualizar: ' + JSON.stringify(person))
           res = await this.update(person)
           this.$root.$emit('showToast', 'Pessoa atualizada com sucesso.')
         }
@@ -220,6 +204,38 @@ export default {
         this.$root.$emit('hideLoading')
       }
     },
+    validateComponents () {
+      return new Promise((resolve) => {
+        const isValidAddress = []
+        const isValidContact = []
+
+        const keys = Object.keys(this.$refs)
+        const arrayPromises = []
+        keys.forEach((ref) => {
+          const component = this.$refs[ref][0]
+          if (component.$options._componentTag.includes('address-form')) {
+            const validate = component.validate
+            if (validate) {
+              arrayPromises.push(validate())
+            }
+          } else if (component.$options._componentTag.includes('contact')) {
+            const validate = component.validate
+            if (validate) {
+              isValidContact.push(validate())
+            }
+          }
+        })
+
+        Promise.all(arrayPromises)
+          .then((res) => {
+            isValidAddress.push(...res)
+            resolve({
+              isValidAddress,
+              isValidContact
+            })
+          })
+      })
+    },
     getInvalidIndex (array) {
       const invalidIndex = []
       array.forEach((item, index) => {
@@ -231,6 +247,11 @@ export default {
       return invalidIndex
     },
     clear () {
+      this.invalidAddress = []
+      this.invalidContact = []
+      this.hasInvalidAddress = false
+      this.hasInvalidContact = false
+
       Object.keys(this.person).forEach((key) => {
         if (!(key === 'address' || key === 'contact')) {
           this.person[key] = ''

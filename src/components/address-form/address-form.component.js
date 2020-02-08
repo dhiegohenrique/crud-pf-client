@@ -154,18 +154,21 @@ export default {
 
       return errors
     },
-    async validate () {
-      this.$v.$touch()
-      await new Promise((resolve) => {
-        const timer = setTimeout(() => {
-          if (!this.$v.address.cep.$pending) {
-            clearTimeout(timer)
-            resolve()
-          }
-        }, 100)
+    validate () {
+      return new Promise((resolve) => {
+        this.$v.$touch()
+        new Promise((resolve) => {
+          const timer = setTimeout(() => {
+            if (!this.$v.address.cep.$pending) {
+              clearTimeout(timer)
+              resolve()
+            }
+          }, 100)
+        })
+          .then(() => {
+            resolve(!this.$v.$invalid)
+          })
       })
-
-      return !this.$v.$invalid
     },
     clear () {
       Object.keys(this.address).forEach((key) => {

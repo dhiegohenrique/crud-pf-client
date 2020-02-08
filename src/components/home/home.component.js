@@ -16,17 +16,18 @@ export default {
     return {
       people: [],
       headers: [
-        // { text: 'ID', value: '_id', sortable: false, align: 'center', search: false },
         { text: 'Criado em', value: 'creationDate', sortable: false, align: 'center', search: false },
         { text: 'Nome', value: 'name', sortable: false, search: true },
         { text: 'CPF', value: 'cpf', sortable: false, search: false },
         { text: 'Nascimento', value: 'birthDate', sortable: false, search: false },
-        { text: 'E-mail', value: 'email', sortable: false, search: false }
+        { text: 'E-mail', value: 'email', sortable: false, search: false },
+        { text: '', value: 'data-table-expand' }
       ],
       notData: 'Nenhum registro',
       notFound: 'Nenhum resultado encontrado',
       searchValue: '',
-      showAddPerson: false
+      showAddPerson: false,
+      expanded: []
     }
   },
   computed: {
@@ -70,7 +71,9 @@ export default {
       if (index === -1) {
         this.people.unshift(person)
       } else {
-        this.set(this.people, index, person)
+        this.$set(this.people, index, person)
+        // eslint-disable-next-line no-console
+        console.log('expanded: ' + JSON.stringify(this.expanded))
       }
     },
     searchItem () {
@@ -107,9 +110,6 @@ export default {
           contact.cellphone = contact.cellphone.replace(/\D/g, '')
           return contact
         })
-
-        // eslint-disable-next-line no-console
-        console.log('item.details: ' + JSON.stringify(item.details))
       } finally {
         this.$root.$emit('hideLoading')
       }
