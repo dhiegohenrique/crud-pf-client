@@ -23,7 +23,57 @@
     </v-row>
   </v-form>
 
-  <address-form ref="address-form"/>
+  <v-tabs centered color="primary" background-color="#E0E0E0" icons-and-text v-model="activeTab">
+    <v-tab href="#address">
+      Endereços
+      <v-icon>local_library</v-icon>
+    </v-tab>
+
+    <v-tab href="#contact">
+      Contatos
+      <v-icon>local_phone</v-icon>
+    </v-tab>
+
+    <v-tab-item key="tab-address" value="address">
+      <v-expansion-panels multiple v-model="invalidAddress">
+        <v-expansion-panel v-for="(address, index) in person.address" :key="index">
+          <v-expansion-panel-header>
+            <v-row class="fill-height ma-0" align="center" justify="space-between" no-gutters>
+              <v-col>
+                Endereço {{index + 1}}
+              </v-col>
+              <v-col class="text-right">
+                <v-tooltip bottom v-if="person.address.length > 1">
+                  <template v-slot:activator="{ on }">
+                    <v-btn fab color="error" v-on="on" x-small @click="removeAddress($event, index)">
+                      <v-icon>remove</v-icon>
+                    </v-btn>
+                  </template>
+                  <span>Excluir</span>
+                </v-tooltip>
+              </v-col>
+            </v-row>
+          </v-expansion-panel-header>
+          <v-expansion-panel-content eager>
+            <address-form :ref="'address-form-'+index" @address="address" />
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
+
+      <v-row class="fill-height ma-0 bottom-bar" align="center" justify="end">
+        <v-btn color="primary" depressed @click="newAddress">
+          Novo
+          <v-icon>add</v-icon>
+        </v-btn>
+      </v-row>
+    </v-tab-item>
+
+    <v-tab-item key="tab-contact" value="contact">
+      <div style="background: red; height: 200px; width: 100%;">
+
+      </div>
+    </v-tab-item>
+  </v-tabs>
 
   <v-row class="bottom-bar">
     <v-col cols="6" class="text-right">

@@ -160,8 +160,6 @@ export default {
     },
     validate () {
       this.$v.$touch()
-      // eslint-disable-next-line no-console
-      console.log('entrou aqui')
       return !this.$v.$invalid
     },
     clear () {

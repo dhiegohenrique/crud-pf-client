@@ -25,7 +25,16 @@ export default {
           cpf: '',
           email: '',
           birthDate: '',
-          address: [],
+          address: [
+            {
+              street: '',
+              cep: '',
+              neighborhood: '',
+              birthDate: '',
+              city: '',
+              uf: ''
+            }
+          ],
           contact: []
         }
       }
@@ -33,6 +42,13 @@ export default {
     isReadOnly: {
       type: Boolean,
       default: false
+    }
+  },
+  data () {
+    return {
+      activeTab: 'address',
+      invalidAddress: [],
+      invalidContact: []
     }
   },
   validations: {
@@ -135,13 +151,13 @@ export default {
       const isValidContact = []
 
       Object.keys(this.$refs).forEach((ref) => {
-        const component = this.$refs[ref]
-        if (component.$options._componentTag === 'address-form') {
+        const component = this.$refs[ref][0]
+        if (component.$options._componentTag.includes('address-form')) {
           const validate = component.validate
           if (validate) {
             isValidAddress.push(validate())
           }
-        } else if (component.$options._componentTag === 'contact-form') {
+        } else if (component.$options._componentTag.includes('contact-form')) {
           const validate = component.validate
           if (validate) {
             isValidContact.push(validate())
@@ -149,26 +165,32 @@ export default {
         }
       })
 
-      const hasInvalidAddress = this.containsInvalid(isValidAddress)
-      const hasInvalidContact = this.containsInvalid(isValidContact)
+      this.invalidAddress = this.getInvalidIndex(isValidAddress, 'address-expansion-')
+      this.invalidContact = this.getInvalidIndex(isValidContact, 'contact-expansion-')
 
-      if (!isValid || hasInvalidAddress || hasInvalidContact) {
+      if (!isValid || this.invalidAddress.length || this.invalidContact.length) {
         return
       }
 
       // eslint-disable-next-line no-console
       console.log('entrou aqui: ' + JSON.stringify(this.person))
     },
-    containsInvalid (array) {
-      return array.some((item) => {
-        return !item
+    getInvalidIndex (array) {
+      const invalidIndex = []
+      array.forEach((item, index) => {
+        if (!item) {
+          invalidIndex.push(index)
+        }
       })
+
+      return invalidIndex
     },
     clear () {
       Object.keys(this.person).forEach((key) => {
         let value = this.person[key]
-        if (Array.isArray(value)) {
-          value = []
+        if (key === 'address') {
+        } else if (key === 'contact') {
+
         } else {
           value = ''
         }
@@ -179,7 +201,7 @@ export default {
       this.$v.$reset()
 
       Object.keys(this.$refs).forEach((ref) => {
-        const component = this.$refs[ref]
+        const component = this.$refs[ref][0]
         const tags = ['address-form', 'contact-form']
         if (tags.includes(component.$options._componentTag)) {
           const clear = component.clear
@@ -194,6 +216,20 @@ export default {
         event.target.value = ''
         event.target.dispatchEvent(new Event('input'))
       }
+    },
+    newAddress () {
+      this.person.address.push({
+        street: '',
+        cep: '',
+        neighborhood: '',
+        birthDate: '',
+        city: '',
+        uf: ''
+      })
+    },
+    removeAddress ($event, index) {
+      this.person.address.splice(index, 1)
+      $event.stopPropagation()
     }
   }
 }
