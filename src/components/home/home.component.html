@@ -1,3 +1,19 @@
 <section class="home">
-  <person-form @save="save"/>
+  <v-row class="search">
+    <v-col cols="12">
+      <v-text-field v-model="searchValue" label="Buscar por nome" clearable />
+    </v-col>
+  </v-row>
+
+  <v-data-table :headers="headers" :items="formattedPeople" item-key="_id" show-expand class="elevation-1"
+    :hide-default-footer="true" :no-data-text="notData" :no-results-text="notFound">
+    <template v-slot:expanded-item="{ headers }">
+      <td :colspan="headers.length">
+        <person-form v-slot:expanded-item="{ headers }" />
+      </td>
+    </template>
+  </v-data-table>
+
+  <br /><br /><br /><br /><br /><br /><br /><br /><br />
+  <person-form @save="save" />
 </section>

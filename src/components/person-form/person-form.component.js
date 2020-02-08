@@ -55,7 +55,9 @@ export default {
     return {
       activeTab: 'address',
       invalidAddress: [],
-      invalidContact: []
+      invalidContact: [],
+      hasInvalidAddress: false,
+      hasInvalidContact: false
     }
   },
   validations: {
@@ -174,15 +176,23 @@ export default {
 
       this.invalidAddress = this.getInvalidIndex(isValidAddress)
       this.invalidContact = this.getInvalidIndex(isValidContact)
+      this.hasInvalidAddress = this.invalidAddress.length
+      this.hasInvalidContact = this.invalidContact.length
 
-      if (!isValid || this.invalidAddress.length || this.invalidContact.length) {
+      if (!isValid || this.hasInvalidAddress || this.hasInvalidContact) {
         return
       }
 
       const person = this._.cloneDeep(this.person)
-      person.contact = person.contact.map((contact) => {
-        return contact.cellphone
+      person.cpf = person.cpf.replace(/\D/g, '')
+      person.address = person.address.map((address) => {
+        address.cep = address.cep.replace(/\D/g, '')
+        return address
       })
+      person.contact = person.contact.map((contact) => {
+        return contact.cellphone.replace(/\D/g, '')
+      })
+      person.birthDate = moment(person.birthDate, 'DD/MM/YYYY')
 
       try {
         this.$root.$emit('showLoading')
