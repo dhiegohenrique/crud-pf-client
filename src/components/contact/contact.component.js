@@ -1,5 +1,5 @@
 import { validationMixin } from 'vuelidate'
-import { mask as maskDirective } from 'vue-the-mask'
+import { mask } from 'vue-the-mask'
 import { required } from 'vuelidate/lib/validators'
 
 export default {
@@ -8,24 +8,7 @@ export default {
     validationMixin
   ],
   directives: {
-    mask: (element, maskOptions) => {
-      const el = document.querySelector('.contact .v-text-field__slot input')
-      if (el) {
-        let value = el.value
-        value = value.replace(/\D/g, '')
-        if (value.length < 11) {
-          maskOptions.value = '(##)####-####'
-        } else {
-          maskOptions.value = '(##)#####-####'
-        }
-      }
-
-      if (!maskOptions.value) {
-        return
-      }
-
-      maskDirective(element, maskOptions)
-    }
+    mask
   },
   props: {
     contact: {

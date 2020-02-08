@@ -153,7 +153,7 @@ export default {
 
       return errors
     },
-    async add () {
+    async save () {
       this.$v.$touch()
       const isValid = !this.$v.$invalid
       const isValidAddress = []
@@ -196,9 +196,20 @@ export default {
 
       try {
         this.$root.$emit('showLoading')
-        const res = await this.insert(person)
-        this.$root.$emit('showToast', 'Pessoa cadastrada com sucesso.')
-        this.$emit('save', res.data)
+        let res
+        if (!person._id) {
+          res = await this.insert(person)
+          this.$root.$emit('showToast', 'Pessoa cadastrada com sucesso.')
+        } else {
+          res = await this.update(person)
+          this.$root.$emit('showToast', 'Pessoa atualizada com sucesso.')
+        }
+
+        if (res.data._id) {
+          person._id = res.data._id
+        }
+
+        this.$emit('save', person)
       } finally {
         this.$root.$emit('hideLoading')
       }
@@ -215,15 +226,7 @@ export default {
     },
     clear () {
       Object.keys(this.person).forEach((key) => {
-        let value = this.person[key]
-        if (key === 'address') {
-        } else if (key === 'contact') {
-
-        } else {
-          value = ''
-        }
-
-        this.person[key] = value
+        this.person[key] = ''
       })
 
       this.$v.$reset()

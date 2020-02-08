@@ -16,6 +16,7 @@ export default {
     return {
       people: [],
       headers: [
+        // { text: 'ID', value: '_id', sortable: false, align: 'center', search: false },
         { text: 'Criado em', value: 'creationDate', sortable: false, align: 'center', search: false },
         { text: 'Nome', value: 'name', sortable: false, search: true },
         { text: 'CPF', value: 'cpf', sortable: false, search: false },
@@ -43,8 +44,9 @@ export default {
           creationDate: moment(creationDate).format('DD/MM/YYYY HH:mm'),
           name,
           cpf: VMasker.toPattern(cpf, '999.999.999-99'),
-          birthDate: moment(birthDate).format('DD/MM/YYYY HH:mm'),
-          email
+          birthDate: moment(birthDate).format('DD/MM/YYYY'),
+          email,
+          details: {}
         }
       })
     }
@@ -59,9 +61,16 @@ export default {
     }
   },
   methods: {
-    save (data) {
-      // eslint-disable-next-line no-console
-      console.log('save: ' + JSON.stringify(data))
+    save (person) {
+      const index = this.people.findIndex((currentPerson) => {
+        return currentPerson._id === person._id
+      })
+
+      if (index === -1) {
+        this.people.unshift(person)
+      } else {
+        this.set(this.people, index, person)
+      }
     },
     searchItem () {
       const search = this.normalizeValue(this.searchValue)
@@ -75,6 +84,34 @@ export default {
       value = String(value)
       value = value.toLowerCase().trim()
       return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    },
+    async itemExpanded ({ item, value }) {
+      if (!value) {
+        return
+      }
+
+      try {
+        this.$root.$emit('showLoading')
+        const res = await this.get(item._id)
+        item.details = res.data
+
+        item.details.cpf = VMasker.toPattern(item.details.cpf, '999.999.999-99')
+        item.details.birthDate = moment(item.details.birthDate).format('DD/MM/YYYY')
+        item.details.address = item.details.address.map((address) => {
+          address.uf = address.uf.uf
+          address.cep = VMasker.toPattern(address.cep, '99999-999')
+          return address
+        })
+        item.details.contact = item.details.contact.map((contact) => {
+          contact.cellphone = contact.cellphone.replace(/\D/g, '')
+          return contact
+        })
+
+        // eslint-disable-next-line no-console
+        console.log('item.details: ' + JSON.stringify(item.details))
+      } finally {
+        this.$root.$emit('hideLoading')
+      }
     }
   }
 }
