@@ -9,10 +9,10 @@
     :hide-default-footer="true" :no-data-text="notData" :no-results-text="notFound" @item-expanded="itemExpanded">
     <template v-slot:expanded-item="{ headers, item }">
       <td :colspan="headers.length" class="details">
-        <person-form v-slot:expanded-item="{ headers }" :person="item.details" v-if="item.details"/>
+        <person-form v-slot:expanded-item="{ headers }" :person="item.details" v-if="item.details" @save="save"/>
       </td>
     </template>
   </v-data-table>
 
-  <person-form @save="save" />
+  <!-- <person-form @save="save" /> -->
 </section>
