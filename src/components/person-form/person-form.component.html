@@ -103,17 +103,23 @@
     </v-tab-item>
   </v-tabs>
 
-  <v-row class="bottom-bar">
-    <v-col cols="6" class="text-right">
+  <v-row class="bottom-bar" align="center" justify="center">
+    <v-col cols="1">
       <v-btn color="primary" @click="save" id="add">
         <v-icon>save</v-icon>
         Salvar
       </v-btn>
     </v-col>
-    <v-col cols="6" class="text-left">
+    <v-col cols="1">
       <v-btn color="error" @click="clear" id="clear">
         <v-icon>clear</v-icon>
         Limpar
+      </v-btn>
+    </v-col>
+    <v-col cols="1" v-if="showCancel">
+      <v-btn color="error" @click="cancel" id="cancel">
+        <v-icon>cancel</v-icon>
+        Cancelar
       </v-btn>
     </v-col>
   </v-row>

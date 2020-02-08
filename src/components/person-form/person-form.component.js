@@ -21,6 +21,10 @@ export default {
     Contact
   },
   props: {
+    showCancel: {
+      type: Boolean,
+      default: false
+    },
     person: {
       type: Object,
       default: () => {
@@ -201,6 +205,8 @@ export default {
           res = await this.insert(person)
           this.$root.$emit('showToast', 'Pessoa cadastrada com sucesso.')
         } else {
+          // eslint-disable-next-line no-console
+          console.log('vai atualizar: ' + JSON.stringify(person))
           res = await this.update(person)
           this.$root.$emit('showToast', 'Pessoa atualizada com sucesso.')
         }
@@ -226,7 +232,9 @@ export default {
     },
     clear () {
       Object.keys(this.person).forEach((key) => {
-        this.person[key] = ''
+        if (!(key === 'address' || key === 'contact')) {
+          this.person[key] = ''
+        }
       })
 
       this.$v.$reset()
@@ -269,6 +277,10 @@ export default {
     removeContact ($event, index) {
       this.person.contact.splice(index, 1)
       $event.stopPropagation()
+    },
+    cancel () {
+      this.clear()
+      this.$emit('cancel')
     }
   }
 }

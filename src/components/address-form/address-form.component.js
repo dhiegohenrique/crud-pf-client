@@ -154,8 +154,17 @@ export default {
 
       return errors
     },
-    validate () {
+    async validate () {
       this.$v.$touch()
+      await new Promise((resolve) => {
+        const timer = setTimeout(() => {
+          if (!this.$v.address.cep.$pending) {
+            clearTimeout(timer)
+            resolve()
+          }
+        }, 100)
+      })
+
       return !this.$v.$invalid
     },
     clear () {

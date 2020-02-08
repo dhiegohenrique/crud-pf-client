@@ -25,7 +25,8 @@ export default {
       ],
       notData: 'Nenhum registro',
       notFound: 'Nenhum resultado encontrado',
-      searchValue: ''
+      searchValue: '',
+      showAddPerson: false
     }
   },
   computed: {
@@ -112,6 +113,12 @@ export default {
       } finally {
         this.$root.$emit('hideLoading')
       }
+    },
+    newPerson () {
+      this.showAddPerson = true
+    },
+    cancel () {
+      this.showAddPerson = false
     }
   }
 }

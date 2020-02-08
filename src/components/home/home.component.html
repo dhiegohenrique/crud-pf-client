@@ -1,4 +1,19 @@
 <section class="home">
+  <v-row class="bottom-bar" align="center" justify="end">
+    <v-col cols="12" class="text-right">
+      <v-btn color="primary" depressed @click="newPerson">
+        Nova pessoa
+        <v-icon>add</v-icon>
+      </v-btn>
+    </v-col>
+
+    <v-col cols="12">
+      <v-card v-if="showAddPerson">
+        <person-form @save="save" :showCancel="true" @cancel="cancel" />
+      </v-card>
+    </v-col>
+  </v-row>
+
   <v-row class="search">
     <v-col cols="12">
       <v-text-field v-model="searchValue" label="Buscar por nome" clearable />
@@ -9,10 +24,8 @@
     :hide-default-footer="true" :no-data-text="notData" :no-results-text="notFound" @item-expanded="itemExpanded">
     <template v-slot:expanded-item="{ headers, item }">
       <td :colspan="headers.length" class="details">
-        <person-form v-slot:expanded-item="{ headers }" :person="item.details" v-if="item.details" @save="save"/>
+        <person-form v-slot:expanded-item="{ headers }" :person="item.details" v-if="item.details" @save="save" />
       </td>
     </template>
   </v-data-table>
-
-  <!-- <person-form @save="save" /> -->
 </section>
