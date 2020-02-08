@@ -3,9 +3,6 @@ import { mask } from 'vue-the-mask'
 import { required, minLength } from 'vuelidate/lib/validators'
 import cepMixin from '@/shared/mixins/cep.mixin'
 import stateMixin from '@/shared/mixins/state.mixin'
-import moment from 'moment-timezone'
-moment.tz.setDefault('America/Sao_Paulo')
-moment.locale('pt-BR')
 
 export default {
   name: 'address-form',
@@ -25,7 +22,6 @@ export default {
           street: '',
           cep: '',
           neighborhood: '',
-          birthDate: '',
           city: '',
           uf: ''
         }
@@ -160,8 +156,6 @@ export default {
     },
     validate () {
       this.$v.$touch()
-      // eslint-disable-next-line no-console
-      console.log('entrou aqui')
       return !this.$v.$invalid
     },
     clear () {

@@ -3,9 +3,8 @@ import { mask } from 'vue-the-mask'
 import { required, email, minLength } from 'vuelidate/lib/validators'
 import cpfGenerator from '@fnando/cpf/dist/node'
 import AddressForm from '@/components/address-form/index'
+import Contact from '@/components/contact/index'
 import moment from 'moment-timezone'
-moment.tz.setDefault('America/Sao_Paulo')
-moment.locale('pt-BR')
 
 export default {
   name: 'person-form',
@@ -14,7 +13,8 @@ export default {
     mask
   },
   components: {
-    AddressForm
+    AddressForm,
+    Contact
   },
   props: {
     person: {
@@ -25,14 +25,33 @@ export default {
           cpf: '',
           email: '',
           birthDate: '',
-          address: [],
-          contact: []
+          address: [
+            {
+              street: '',
+              cep: '',
+              neighborhood: '',
+              city: '',
+              uf: ''
+            }
+          ],
+          contact: [
+            {
+              cellphone: ''
+            }
+          ]
         }
       }
     },
     isReadOnly: {
       type: Boolean,
       default: false
+    }
+  },
+  data () {
+    return {
+      activeTab: 'address',
+      invalidAddress: [],
+      invalidContact: []
     }
   },
   validations: {
@@ -135,13 +154,13 @@ export default {
       const isValidContact = []
 
       Object.keys(this.$refs).forEach((ref) => {
-        const component = this.$refs[ref]
-        if (component.$options._componentTag === 'address-form') {
+        const component = this.$refs[ref][0]
+        if (component.$options._componentTag.includes('address-form')) {
           const validate = component.validate
           if (validate) {
             isValidAddress.push(validate())
           }
-        } else if (component.$options._componentTag === 'contact-form') {
+        } else if (component.$options._componentTag.includes('contact')) {
           const validate = component.validate
           if (validate) {
             isValidContact.push(validate())
@@ -149,26 +168,32 @@ export default {
         }
       })
 
-      const hasInvalidAddress = this.containsInvalid(isValidAddress)
-      const hasInvalidContact = this.containsInvalid(isValidContact)
+      this.invalidAddress = this.getInvalidIndex(isValidAddress, 'address-expansion-')
+      this.invalidContact = this.getInvalidIndex(isValidContact, 'contact-expansion-')
 
-      if (!isValid || hasInvalidAddress || hasInvalidContact) {
+      if (!isValid || this.invalidAddress.length || this.invalidContact.length) {
         return
       }
 
       // eslint-disable-next-line no-console
       console.log('entrou aqui: ' + JSON.stringify(this.person))
     },
-    containsInvalid (array) {
-      return array.some((item) => {
-        return !item
+    getInvalidIndex (array) {
+      const invalidIndex = []
+      array.forEach((item, index) => {
+        if (!item) {
+          invalidIndex.push(index)
+        }
       })
+
+      return invalidIndex
     },
     clear () {
       Object.keys(this.person).forEach((key) => {
         let value = this.person[key]
-        if (Array.isArray(value)) {
-          value = []
+        if (key === 'address') {
+        } else if (key === 'contact') {
+
         } else {
           value = ''
         }
@@ -179,8 +204,8 @@ export default {
       this.$v.$reset()
 
       Object.keys(this.$refs).forEach((ref) => {
-        const component = this.$refs[ref]
-        const tags = ['address-form', 'contact-form']
+        const component = this.$refs[ref][0]
+        const tags = ['address-form', 'contact']
         if (tags.includes(component.$options._componentTag)) {
           const clear = component.clear
           if (clear) {
@@ -194,6 +219,28 @@ export default {
         event.target.value = ''
         event.target.dispatchEvent(new Event('input'))
       }
+    },
+    newAddress () {
+      this.person.address.push({
+        street: '',
+        cep: '',
+        neighborhood: '',
+        city: '',
+        uf: ''
+      })
+    },
+    newContact () {
+      this.person.contact.push({
+        cellphone: ''
+      })
+    },
+    removeAddress ($event, index) {
+      this.person.address.splice(index, 1)
+      $event.stopPropagation()
+    },
+    removeContact ($event, index) {
+      this.person.contact.splice(index, 1)
+      $event.stopPropagation()
     }
   }
 }
