@@ -16,6 +16,7 @@ npm i
 ```
 npm run serve
 ```
+estará rodando em http://localhost:8080
 
-## API rodando em:
+## Client rodando em:
 https://crud-pf-client.herokuapp.com/
