@@ -11,6 +11,7 @@
   "dependencies": {
     "@fnando/cpf": "^0.1.1",
     "axios": "^0.19.1",
+    "cep-promise": "^3.0.9",
     "core-js": "^3.4.4",
     "express": "^4.17.1",
     "moment": "^2.24.0",

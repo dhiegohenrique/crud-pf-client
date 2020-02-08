@@ -1,0 +1,13 @@
+.address-form {
+  .v-form {
+    .row {
+      .col:nth-last-child(2) {
+        padding-right: 20px;
+      }
+
+      .col:nth-last-child(3) {
+        padding-right: 20px;
+      }
+    }
+  }
+}

@@ -2,6 +2,7 @@ import { validationMixin } from 'vuelidate'
 import { mask } from 'vue-the-mask'
 import { required, email, minLength } from 'vuelidate/lib/validators'
 import cpfGenerator from '@fnando/cpf/dist/node'
+import AddressForm from '@/components/address-form/index'
 import moment from 'moment-timezone'
 moment.tz.setDefault('America/Sao_Paulo')
 moment.locale('pt-BR')
@@ -12,6 +13,9 @@ export default {
   directives: {
     mask
   },
+  components: {
+    AddressForm
+  },
   props: {
     person: {
       type: Object,
@@ -21,8 +25,6 @@ export default {
           cpf: '',
           email: '',
           birthDate: '',
-          street: '',
-          cellphone: '',
           address: [],
           contact: []
         }
@@ -62,51 +64,6 @@ export default {
 
           return moment(value, 'DD/MM/YYYY').isValid()
         }
-      }
-      // street: {
-      //   required
-      // },
-      // cellphone: {
-      //   required
-      // }
-      // address: this.rulesAddress,
-      // contact: this.rulesContact
-    }
-  },
-  computed: {
-    rulesAddress () {
-      const fields = ['street', 'cep', 'neighborhood', 'city', 'uf']
-
-      const validation = {}
-      fields.forEach((field) => {
-        const obj = {}
-        obj[field] = {
-          required,
-          minLength: minLength(3)
-        }
-
-        Object.assign(validation, obj)
-      })
-
-      return {
-        $each: validation
-      }
-    },
-    rulesContact () {
-      const fields = ['cellphone']
-
-      const validation = {}
-      fields.forEach((field) => {
-        const obj = {}
-        obj[field] = {
-          required
-        }
-
-        Object.assign(validation, obj)
-      })
-
-      return {
-        $each: validation
       }
     }
   },
@@ -173,12 +130,39 @@ export default {
     },
     add () {
       this.$v.$touch()
-      if (this.$v.$invalid) {
+      const isValid = !this.$v.$invalid
+      const isValidAddress = []
+      const isValidContact = []
+
+      Object.keys(this.$refs).forEach((ref) => {
+        const component = this.$refs[ref]
+        if (component.$options._componentTag === 'address-form') {
+          const validate = component.validate
+          if (validate) {
+            isValidAddress.push(validate())
+          }
+        } else if (component.$options._componentTag === 'contact-form') {
+          const validate = component.validate
+          if (validate) {
+            isValidContact.push(validate())
+          }
+        }
+      })
+
+      const hasInvalidAddress = this.containsInvalid(isValidAddress)
+      const hasInvalidContact = this.containsInvalid(isValidContact)
+
+      if (!isValid || hasInvalidAddress || hasInvalidContact) {
         return
       }
 
       // eslint-disable-next-line no-console
       console.log('entrou aqui: ' + JSON.stringify(this.person))
+    },
+    containsInvalid (array) {
+      return array.some((item) => {
+        return !item
+      })
     },
     clear () {
       Object.keys(this.person).forEach((key) => {
@@ -193,6 +177,17 @@ export default {
       })
 
       this.$v.$reset()
+
+      Object.keys(this.$refs).forEach((ref) => {
+        const component = this.$refs[ref]
+        const tags = ['address-form', 'contact-form']
+        if (tags.includes(component.$options._componentTag)) {
+          const clear = component.clear
+          if (clear) {
+            clear()
+          }
+        }
+      })
     },
     validateLength (event, length) {
       if (event.target.value.length !== length) {

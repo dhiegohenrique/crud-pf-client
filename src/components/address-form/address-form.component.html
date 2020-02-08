@@ -1,0 +1,28 @@
+<section class="address-form">
+  <v-form>
+    <v-row class="fill-height ma-0" align="center" justify="space-between" no-gutters>
+      <v-col cols="6">
+        <v-text-field v-model="address.street" label="Logradouro" :error-messages="getStreetErrors()" maxlength="100"
+          :disabled="isReadOnly" />
+      </v-col>
+      <v-col cols="6">
+        <v-text-field v-model="address.cep" label="CEP" v-mask="'#####-###'" :error-messages="getCepErrors()"
+          @input="$v.address.cep.$touch()" @blur="validateLength($event, 9)" :disabled="isReadOnly" />
+      </v-col>
+    </v-row>
+    <v-row no-gutters>
+      <v-col>
+        <v-text-field v-model="address.neighborhood" label="Bairro" :error-messages="getNeighborhoodErrors()"
+          maxlength="100" :disabled="isReadOnly" />
+      </v-col>
+      <v-col>
+        <v-text-field v-model="address.city" label="Cidade" :error-messages="getCityErrors()" maxlength="100"
+          :disabled="isReadOnly" />
+      </v-col>
+      <v-col>
+        <v-autocomplete v-model="address.uf" label="Estado" :error-messages="getUfErrors()" :items="stateAcronyms" maxlength="2"
+          no-data-text="Nenhum resultado encontrado" :disabled="isReadOnly" />
+      </v-col>
+    </v-row>
+  </v-form>
+</section>
