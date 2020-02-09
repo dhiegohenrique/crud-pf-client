@@ -11,4 +11,20 @@
   .v-card {
     padding: 20px;
   }
+
+  .v-card__title {
+    padding-left: 0px !important;
+  }
+
+  .v-card__actions {
+    .row {
+      .text-right {
+        margin-right: 10px;
+      }
+
+      .text-left {
+        margin-left: 10px;
+      }
+    }
+  }
 }

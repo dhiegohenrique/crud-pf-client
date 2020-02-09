@@ -21,13 +21,16 @@ export default {
         { text: 'CPF', value: 'cpf', sortable: false, search: false },
         { text: 'Nascimento', value: 'birthDate', sortable: false, search: false },
         { text: 'E-mail', value: 'email', sortable: false, search: false },
+        { text: '', value: 'actions', sortable: false, align: 'center', search: false, width: 100 },
         { text: '', value: 'data-table-expand' }
       ],
       notData: 'Nenhum registro',
       notFound: 'Nenhum resultado encontrado',
       searchValue: '',
       showAddPerson: false,
-      expanded: []
+      expanded: [],
+      showConfirmation: false,
+      currentPerson: {}
     }
   },
   computed: {
@@ -118,6 +121,16 @@ export default {
     },
     cancel () {
       this.showAddPerson = false
+    },
+    removePerson (person) {
+      // eslint-disable-next-line no-console
+      console.log('removePerson: ' + JSON.stringify(person))
+      this.currentPerson = person
+      this.showConfirmation = true
+    },
+    confirmRemovePerson () {
+      // eslint-disable-next-line no-console
+      console.log('confirmout: ' + JSON.stringify(this.currentPerson))
     }
   }
 }
