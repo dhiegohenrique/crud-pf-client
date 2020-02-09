@@ -16,7 +16,7 @@ export default {
     return {
       people: [],
       headers: [
-        { text: 'Criado em', value: 'creationDate', sortable: false, align: 'center', search: false },
+        { text: 'Criado em', value: 'formattedCreationDate', sortable: false, align: 'center', search: false },
         { text: 'Nome', value: 'name', sortable: false, search: true },
         { text: 'CPF', value: 'cpf', sortable: false, search: false },
         { text: 'Nascimento', value: 'birthDate', sortable: false, search: false },
@@ -42,11 +42,11 @@ export default {
         items = this.searchItem()
       }
 
-      return items.map((person) => {
+      return items.map((person, index) => {
         const { _id, creationDate, name, cpf, email, birthDate } = person
         return {
           _id,
-          creationDate: moment(creationDate).format('DD/MM/YYYY HH:mm'),
+          formattedCreationDate: moment(creationDate).format('DD/MM/YYYY HH:mm'),
           name,
           cpf: VMasker.toPattern(cpf, '999.999.999-99'),
           birthDate: moment(birthDate).format('DD/MM/YYYY'),
@@ -123,14 +123,24 @@ export default {
       this.showAddPerson = false
     },
     removePerson (person) {
-      // eslint-disable-next-line no-console
-      console.log('removePerson: ' + JSON.stringify(person))
       this.currentPerson = person
       this.showConfirmation = true
     },
-    confirmRemovePerson () {
-      // eslint-disable-next-line no-console
-      console.log('confirmout: ' + JSON.stringify(this.currentPerson))
+    async confirmRemovePerson () {
+      try {
+        this.$root.$emit('showLoading')
+        await this.delete(this.currentPerson._id)
+
+        const index = this.people.findIndex((person) => {
+          return person._id === this.currentPerson._id
+        })
+
+        this.people.splice(index, 1)
+        this.$root.$emit('showToast', 'Pessoa excluída com sucesso.')
+        this.showConfirmation = false
+      } finally {
+        this.$root.$emit('hideLoading')
+      }
     }
   }
 }
