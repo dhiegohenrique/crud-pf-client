@@ -21,6 +21,10 @@ export default {
     Contact
   },
   props: {
+    showCancel: {
+      type: Boolean,
+      default: false
+    },
     person: {
       type: Object,
       default: () => {
@@ -55,7 +59,10 @@ export default {
     return {
       activeTab: 'address',
       invalidAddress: [],
-      invalidContact: []
+      invalidContact: [],
+      hasInvalidAddress: false,
+      hasInvalidContact: false,
+      originalPerson: {}
     }
   },
   validations: {
@@ -151,47 +158,95 @@ export default {
 
       return errors
     },
-    async add () {
+    async savePerson () {
+      this.$root.$emit('showLoading')
+
       this.$v.$touch()
       const isValid = !this.$v.$invalid
-      const isValidAddress = []
-      const isValidContact = []
-
-      Object.keys(this.$refs).forEach((ref) => {
-        const component = this.$refs[ref][0]
-        if (component.$options._componentTag.includes('address-form')) {
-          const validate = component.validate
-          if (validate) {
-            isValidAddress.push(validate())
-          }
-        } else if (component.$options._componentTag.includes('contact')) {
-          const validate = component.validate
-          if (validate) {
-            isValidContact.push(validate())
-          }
-        }
-      })
+      const { isValidAddress, isValidContact } = await this.validateComponents()
 
       this.invalidAddress = this.getInvalidIndex(isValidAddress)
       this.invalidContact = this.getInvalidIndex(isValidContact)
+      this.hasInvalidAddress = this.invalidAddress.length
+      this.hasInvalidContact = this.invalidContact.length
 
-      if (!isValid || this.invalidAddress.length || this.invalidContact.length) {
+      if (!isValid || this.hasInvalidAddress || this.hasInvalidContact) {
+        this.$root.$emit('hideLoading')
         return
       }
 
       const person = this._.cloneDeep(this.person)
-      person.contact = person.contact.map((contact) => {
-        return contact.cellphone
+
+      person.cpf = person.cpf.replace(/\D/g, '')
+      person.address = person.address.map((address) => {
+        address.cep = address.cep.replace(/\D/g, '')
+        return address
       })
+      person.birthDate = moment(person.birthDate, 'DD/MM/YYYY')
 
       try {
-        this.$root.$emit('showLoading')
-        const res = await this.insert(person)
-        this.$root.$emit('showToast', 'Pessoa cadastrada com sucesso.')
-        this.$emit('save', res.data)
+        let res
+        if (!person._id) {
+          person.contact = person.contact.map((contact) => {
+            return contact.cellphone.replace(/\D/g, '')
+          })
+
+          res = await this.insert(person)
+          this.$root.$emit('showToast', 'Pessoa cadastrada com sucesso.')
+          this.cancel()
+        } else {
+          res = await this.update(person)
+          this.$root.$emit('showToast', 'Pessoa atualizada com sucesso.')
+        }
+
+        if (res.data._id) {
+          person._id = res.data._id
+        }
+
+        this.clear()
+        this.$emit('save', person)
       } finally {
         this.$root.$emit('hideLoading')
       }
+    },
+    validateComponents () {
+      return new Promise((resolve) => {
+        const isValidAddress = []
+        const isValidContact = []
+
+        const keys = Object.keys(this.$refs)
+        const arrayPromises = []
+
+        keys.forEach((ref) => {
+          let component = this.$refs[ref]
+          if (Array.isArray(component)) {
+            component = component[0]
+          }
+
+          if (component && component.$options._componentTag.includes('address-form')) {
+            const validate = component.validate
+            if (validate) {
+              arrayPromises.push(validate())
+            }
+          } else if (component && component.$options._componentTag.includes('contact')) {
+            const validate = component.validate
+            if (validate) {
+              isValidContact.push(validate())
+            }
+          }
+        })
+
+        Promise.all(arrayPromises)
+          .then((res) => {
+            isValidAddress.push(...res)
+            resolve({
+              isValidAddress,
+              isValidContact
+            })
+          })
+          .finally(() => {
+          })
+      })
     },
     getInvalidIndex (array) {
       const invalidIndex = []
@@ -204,24 +259,27 @@ export default {
       return invalidIndex
     },
     clear () {
+      this.invalidAddress = []
+      this.invalidContact = []
+      this.hasInvalidAddress = false
+      this.hasInvalidContact = false
+
       Object.keys(this.person).forEach((key) => {
-        let value = this.person[key]
-        if (key === 'address') {
-        } else if (key === 'contact') {
-
-        } else {
-          value = ''
+        if (!(key === 'address' || key === 'contact')) {
+          this.person[key] = ''
         }
-
-        this.person[key] = value
       })
 
       this.$v.$reset()
 
+      const tags = ['address-form', 'contact']
       Object.keys(this.$refs).forEach((ref) => {
-        const component = this.$refs[ref][0]
-        const tags = ['address-form', 'contact']
-        if (tags.includes(component.$options._componentTag)) {
+        let component = this.$refs[ref]
+        if (Array.isArray(component)) {
+          component = component[0]
+        }
+
+        if (component && tags.includes(component.$options._componentTag)) {
           const clear = component.clear
           if (clear) {
             clear()
@@ -256,6 +314,10 @@ export default {
     removeContact ($event, index) {
       this.person.contact.splice(index, 1)
       $event.stopPropagation()
+    },
+    cancel () {
+      this.clear()
+      this.$emit('cancel')
     }
   }
 }

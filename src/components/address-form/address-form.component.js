@@ -34,7 +34,8 @@ export default {
   },
   data () {
     return {
-      stateAcronyms: []
+      stateAcronyms: [],
+      isCepValid: true
     }
   },
   validations: {
@@ -45,20 +46,8 @@ export default {
       },
       cep: {
         required,
-        valid: async function (value) {
-          if (value.length < 9) {
-            return true
-          }
-
-          let isValid
-          try {
-            this.$root.$emit('showLoading')
-            isValid = await this.isValidCep(value)
-          } finally {
-            this.$root.$emit('hideLoading')
-          }
-
-          return isValid
+        valid: function () {
+          return this.isCepValid
         }
       },
       neighborhood: {
@@ -155,8 +144,27 @@ export default {
       return errors
     },
     validate () {
-      this.$v.$touch()
-      return !this.$v.$invalid
+      return new Promise((resolve) => {
+        this.validateCep()
+          .then(() => {
+            this.$v.$touch()
+            resolve(!this.$v.$invalid)
+          })
+      })
+    },
+    validateCep () {
+      return new Promise((resolve) => {
+        if (this.address.cep.length < 9) {
+          this.isCepValid = true
+          return resolve()
+        }
+
+        this.isValidCep(this.address.cep)
+          .then((isValid) => {
+            this.isCepValid = isValid
+            resolve()
+          })
+      })
     },
     clear () {
       Object.keys(this.address).forEach((key) => {

@@ -3,7 +3,7 @@
     <v-row class="fill-height ma-0" align="center" justify="space-between" no-gutters>
       <v-col cols="4">
         <v-text-field v-model="contact.cellphone" label="Celular" :error-messages="getCellphoneErrors()"
-          v-mask="'(##)#####-####'" @blur="validateLength($event)" :disabled="isReadOnly" />
+         v-mask="['(##)####-####', '(##)#####-####']" @blur="validateLength($event)" :disabled="isReadOnly" />
       </v-col>
     </v-row>
   </v-form>

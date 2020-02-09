@@ -11,7 +11,9 @@ export default {
     })
 
     this.$root.$on('hideLoading', () => {
-      this.showLoading = false
+      setTimeout(() => {
+        this.showLoading = false
+      }, 100)
     })
   }
 }

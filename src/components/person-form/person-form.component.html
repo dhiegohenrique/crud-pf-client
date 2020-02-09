@@ -24,12 +24,12 @@
   </v-form>
 
   <v-tabs centered color="primary" background-color="#E0E0E0" icons-and-text v-model="activeTab">
-    <v-tab href="#address" :class="{'tab-error': invalidAddress.length}">
+    <v-tab href="#address" :class="{'tab-error': hasInvalidAddress}">
       Endereços
       <v-icon>local_library</v-icon>
     </v-tab>
 
-    <v-tab href="#contact" :class="{'tab-error': invalidContact.length}">
+    <v-tab href="#contact" :class="{'tab-error': hasInvalidContact}">
       Contatos
       <v-icon>local_phone</v-icon>
     </v-tab>
@@ -62,8 +62,8 @@
 
       <v-row class="fill-height ma-0 bottom-bar" align="center" justify="end">
         <v-btn color="primary" depressed @click="newAddress">
-          Novo
           <v-icon>add</v-icon>
+          Novo
         </v-btn>
       </v-row>
     </v-tab-item>
@@ -96,24 +96,30 @@
 
       <v-row class="fill-height ma-0 bottom-bar" align="center" justify="end">
         <v-btn color="primary" depressed @click="newContact">
-          Novo
           <v-icon>add</v-icon>
+          Novo
         </v-btn>
       </v-row>
     </v-tab-item>
   </v-tabs>
 
-  <v-row class="bottom-bar">
-    <v-col cols="6" class="text-right">
-      <v-btn color="primary" @click="add" id="add">
+  <v-row class="bottom-bar" align="center" justify="center">
+    <v-col cols="1">
+      <v-btn color="primary" @click="savePerson" id="add">
         <v-icon>save</v-icon>
         Salvar
       </v-btn>
     </v-col>
-    <v-col cols="6" class="text-left">
+    <v-col cols="1">
       <v-btn color="error" @click="clear" id="clear">
         <v-icon>clear</v-icon>
         Limpar
+      </v-btn>
+    </v-col>
+    <v-col cols="1" v-if="showCancel">
+      <v-btn color="error" @click="cancel" id="cancel">
+        <v-icon>cancel</v-icon>
+        Cancelar
       </v-btn>
     </v-col>
   </v-row>
