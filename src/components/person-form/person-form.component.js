@@ -6,6 +6,7 @@ import AddressForm from '@/components/address-form/index'
 import Contact from '@/components/contact/index'
 import moment from 'moment-timezone'
 import personMixin from '@/shared/mixins/person.mixin'
+import equal from 'deep-equal'
 
 export default {
   name: 'person-form',
@@ -61,7 +62,8 @@ export default {
       invalidAddress: [],
       invalidContact: [],
       hasInvalidAddress: false,
-      hasInvalidContact: false
+      hasInvalidContact: false,
+      originalPerson: {}
     }
   },
   validations: {
@@ -157,7 +159,9 @@ export default {
 
       return errors
     },
-    async save () {
+    async savePerson () {
+      // // eslint-disable-next-line no-debugger
+      // debugger
       this.$v.$touch()
       const isValid = !this.$v.$invalid
       const { isValidAddress, isValidContact } = await this.validateComponents()
@@ -167,11 +171,27 @@ export default {
       this.hasInvalidAddress = this.invalidAddress.length
       this.hasInvalidContact = this.invalidContact.length
 
+      // eslint-disable-next-line no-console
+      console.log('isValid: ' + isValid)
+
+      // eslint-disable-next-line no-console
+      console.log('invalidAddress: ' + JSON.stringify(this.invalidAddress))
+
+      // eslint-disable-next-line no-console
+      console.log('invalidContact: ' + JSON.stringify(this.invalidContact))
+
       if (!isValid || this.hasInvalidAddress || this.hasInvalidContact) {
         return
       }
 
+      // if (equal(this.person, this.originalPerson)) {
+      //   // eslint-disable-next-line no-console
+      //   console.log('é igual, não faz nada')
+      //   return
+      // }
+
       const person = this._.cloneDeep(this.person)
+
       person.cpf = person.cpf.replace(/\D/g, '')
       person.address = person.address.map((address) => {
         address.cep = address.cep.replace(/\D/g, '')
@@ -181,6 +201,9 @@ export default {
 
       try {
         this.$root.$emit('showLoading')
+        // eslint-disable-next-line no-console
+        console.log('é válido, tem: ' + JSON.stringify(person))
+
         let res
         if (!person._id) {
           person.contact = person.contact.map((contact) => {
@@ -191,6 +214,9 @@ export default {
           this.$root.$emit('showToast', 'Pessoa cadastrada com sucesso.')
           this.cancel()
         } else {
+          // eslint-disable-next-line no-console
+          console.log('vai atualizar: ' + JSON.stringify(person))
+
           res = await this.update(person)
           this.$root.$emit('showToast', 'Pessoa atualizada com sucesso.')
         }
@@ -211,14 +237,20 @@ export default {
 
         const keys = Object.keys(this.$refs)
         const arrayPromises = []
+        this.$root.$emit('showLoading')
+
         keys.forEach((ref) => {
-          const component = this.$refs[ref][0]
-          if (component.$options._componentTag.includes('address-form')) {
+          let component = this.$refs[ref]
+          if (Array.isArray(component)) {
+            component = component[0]
+          }
+
+          if (component && component.$options._componentTag.includes('address-form')) {
             const validate = component.validate
             if (validate) {
               arrayPromises.push(validate())
             }
-          } else if (component.$options._componentTag.includes('contact')) {
+          } else if (component && component.$options._componentTag.includes('contact')) {
             const validate = component.validate
             if (validate) {
               isValidContact.push(validate())
@@ -226,13 +258,25 @@ export default {
           }
         })
 
+        // eslint-disable-next-line no-console
+        console.log('tem isso1: ' + JSON.stringify(arrayPromises))
         Promise.all(arrayPromises)
           .then((res) => {
+            // eslint-disable-next-line no-console
+            console.log('res: ' + JSON.stringify(res))
+
             isValidAddress.push(...res)
+            // eslint-disable-next-line no-console
+            console.log('tem isso2: ' + JSON.stringify(isValidAddress))
+            // this.$root.$emit('hideLoading')
+
             resolve({
               isValidAddress,
               isValidContact
             })
+          })
+          .finally(() => {
+            this.$root.$emit('hideLoading')
           })
       })
     },
@@ -260,10 +304,14 @@ export default {
 
       this.$v.$reset()
 
+      const tags = ['address-form', 'contact']
       Object.keys(this.$refs).forEach((ref) => {
-        const component = this.$refs[ref][0]
-        const tags = ['address-form', 'contact']
-        if (tags.includes(component.$options._componentTag)) {
+        let component = this.$refs[ref]
+        if (Array.isArray(component)) {
+          component = component[0]
+        }
+
+        if (component && tags.includes(component.$options._componentTag)) {
           const clear = component.clear
           if (clear) {
             clear()
@@ -302,6 +350,13 @@ export default {
     cancel () {
       this.clear()
       this.$emit('cancel')
+    }
+  },
+  watch: {
+    person: function () {
+      if (!Object.keys(this.originalPerson).length) {
+        this.originalPerson = this._.cloneDeep(this.person)
+      }
     }
   }
 }
