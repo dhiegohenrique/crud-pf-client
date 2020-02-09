@@ -2,8 +2,8 @@
   <v-row class="bottom-bar" align="center" justify="end">
     <v-col cols="12" class="text-right">
       <v-btn color="primary" depressed @click="newPerson">
-        Nova pessoa
         <v-icon>add</v-icon>
+        Nova pessoa
       </v-btn>
     </v-col>
 
@@ -33,43 +33,40 @@
       <v-row class="actions" no-gutters>
         <v-col cols="12">
           <v-row justify="center">
-            <v-dialog v-model="showConfirmation" persistent max-width="290" eager attach>
+            <v-tooltip bottom>
               <template v-slot:activator="{ on }">
-                <!-- <v-btn color="primary" dark v-on="on">Open Dialog</v-btn> -->
-
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on }">
-                    <v-btn fab color="error" v-on="on" x-small @click="removePerson(item)">
-                      <v-icon>remove</v-icon>
-                    </v-btn>
-                  </template>
-                  <span>Excluir</span>
-                </v-tooltip>
+                <v-btn fab color="error" v-on="on" x-small @click="removePerson(item)">
+                  <v-icon>remove</v-icon>
+                </v-btn>
               </template>
-              <v-card>
-                <v-card-title class="headline">Confirmação</v-card-title>
-                <v-card-text>Você confirma a exclução de <b>{{currentPerson.name}}</b>?</v-card-text>
-                <v-card-actions>
-                  <v-row no-gutters>
-                    <v-col class="text-right">
-                      <v-btn color="primary" @click="confirmRemovePerson">
-                        <v-icon>done</v-icon>
-                        Sim
-                      </v-btn>
-                    </v-col>
-                    <v-col class="text-left">
-                      <v-btn color="error" @click="showConfirmation = false">
-                        <v-icon>cancel</v-icon>
-                        Não
-                      </v-btn>
-                    </v-col>
-                  </v-row>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
+              <span>Excluir</span>
+            </v-tooltip>
           </v-row>
         </v-col>
       </v-row>
     </template>
   </v-data-table>
+
+  <v-dialog v-model="showConfirmation" persistent max-width="290" eager attach>
+    <v-card>
+      <v-card-title class="headline">Confirmação</v-card-title>
+      <v-card-text>Você confirma a exclução de <b>{{currentPerson.name}}</b>?</v-card-text>
+      <v-card-actions>
+        <v-row no-gutters>
+          <v-col class="text-right">
+            <v-btn color="primary" @click="confirmRemovePerson">
+              <v-icon>done</v-icon>
+              Sim
+            </v-btn>
+          </v-col>
+          <v-col class="text-left">
+            <v-btn color="error" @click="showConfirmation = false">
+              <v-icon>cancel</v-icon>
+              Não
+            </v-btn>
+          </v-col>
+        </v-row>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 </section>
