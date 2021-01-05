@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@fnando/cpf": "^0.1.1",
-    "axios": "^0.19.1",
+    "axios": "^0.21.1",
     "cep-promise": "^3.0.9",
     "core-js": "^3.4.4",
     "deep-equal": "^2.0.1",
