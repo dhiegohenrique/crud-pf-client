@@ -15,7 +15,7 @@
     "core-js": "^3.4.4",
     "deep-equal": "^2.0.1",
     "express": "^4.17.1",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "moment-timezone": "^0.5.27",
     "vue": "^2.6.10",
     "vue-click-outside": "^1.0.7",
